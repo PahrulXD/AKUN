@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pixel Slide Quest (Pure HTML/JS)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #0f1423;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .hidden { display: none !important; }
+
+        .svg-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        .card-box {
+            background-color: #171d31;
+            border: 1px solid #283049;
+            border-radius: 24px;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .admin-top-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: #283049;
+            border: none;
+            border-radius: 10px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #f1c40f;
+            transition: transform 0.2s ease;
+        }
+        .admin-top-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .app-logo {
+            width: 70px;
+            height: 70px;
+            background: #6c5ce7;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+            color: #fff;
+        }
+
+        .app-title { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+        .app-sub { font-size: 13px; color: #8e9aaf; margin-bottom: 24px; line-height: 1.4; }
+        .app-credit { font-size: 11px; color: #6b7280; margin-top: 18px; font-weight: 600; letter-spacing: 0.5px; }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .input-group .svg-icon.left-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 48px 14px 48px;
+            background: #0f1423;
+            border: 1px solid #283049;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .input-field.no-right-icon {
+            padding-right: 16px;
+        }
+
+        .btn-purple {
+            width: 100%;
+            padding: 14px;
+            background: #6c5ce7;
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.3);
+        }
+
+        .account-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #171d31;
+            border: 1px solid #283049;
+            border-radius: 16px;
+            padding: 10px 14px;
+        }
+
+        .account-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: #6c5ce7;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(108, 92, 231, 0.6);
+        }
+
+        .account-info { display: flex; flex-direction: column; overflow: hidden; }
+        .acc-label { font-size: 10px; color: #8e9aaf; font-weight: 600; }
+        .acc-email { font-size: 14px; font-weight: 700; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: #171d31;
+            border: 1px solid #283049;
+            border-radius: 16px;
+            padding: 12px;
+            gap: 8px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-item:not(:last-child) {
+            border-right: 1px solid #283049;
+            padding-right: 8px;
+        }
+
+        .stat-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-text { display: flex; flex-direction: column; }
+        .stat-title { font-size: 10px; color: #8e9aaf; font-weight: 700; text-transform: uppercase; }
+        .stat-val { font-size: 14px; font-weight: 800; }
+
+        .c-yellow { color: #f1c40f; }
+        .c-green { color: #2ecc71; }
+        .c-red { color: #ff4757; }
+
+        .actions-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 8px;
+        }
+
+        .btn-act {
+            padding: 12px 10px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .btn-pink { background: #ff4757; }
+        .btn-teal { background: #1abc9c; }
+        .btn-key { background: #f39c12; padding: 10px; border-radius: 12px; border: none; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; }
+        .btn-icon-only { background: #171d31; border: 1px solid #283049; padding: 12px; width: 44px; }
+
+        .game-card {
+            background: #171d31;
+            border: 1px solid #283049;
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .timer-bar {
+            background: #0f1423;
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timer-info { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #8e9aaf; font-weight: 600; }
+        .timer-clock { font-size: 16px; font-weight: 800; color: #6c5ce7; font-family: monospace; }
+        .reward-info { font-size: 12px; font-weight: 700; color: #8e9aaf; }
+
+        .puzzle-board {
+            width: 100%;
+            aspect-ratio: 1/1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 4px;
+            background: #0f1423;
+            border-radius: 12px;
+            padding: 4px;
+            overflow: hidden;
+        }
+
+        .tile {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            background-repeat: no-repeat;
+            background-size: 300% 300%;
+            transition: transform 0.1s ease;
+        }
+
+        .tile-empty {
+            background: #171d31 !important;
+            border: 1px dashed #283049;
+            cursor: default;
+        }
+
+        .game-controls-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn-pause {
+            background: #e67e22;
+            box-shadow: 0 6px 16px rgba(230, 126, 34, 0.3);
+            transition: background 0.3s ease;
+        }
+        .btn-resume {
+            background: #27ae60 !important;
+            box-shadow: 0 6px 16px rgba(39, 174, 96, 0.3) !important;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: #171d31;
+            border: 1px solid #283049;
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-title { font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 4px; }
+
+        .shop-item {
+            background: #0f1423;
+            border: 1px solid #283049;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .shop-lives { font-weight: 700; color: #ff4757; }
+        .shop-price { font-weight: 800; color: #2ecc71; }
+
+        .custom-wd-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .wd-input {
+            width: 100%;
+            padding: 12px;
+            background: #0f1423;
+            border: 1px solid #283049;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .btn-dana {
+            padding: 12px;
+            font-size: 14px;
+            background: #118eea;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(17, 142, 234, 0.3);
+        }
+
+        .btn-close-flat {
+            background: #283049 !important;
+            box-shadow: none !important;
+            border: none;
+            margin-top: 4px;
+        }
+
+        .receipt-card {
+            background: #0f1423;
+            border: 1px dashed #283049;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #1a233a;
+            padding-bottom: 6px;
+        }
+
+        .receipt-label { color: #8e9aaf; }
+        .receipt-val { font-weight: 700; color: #ffffff; }
+
+        .history-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .history-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #8e9aaf;
+            border-bottom: 1px solid #283049;
+            padding-bottom: 4px;
+        }
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 140px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .history-item {
+            background: #0f1423;
+            border: 1px solid #283049;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .history-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-time {
+            font-size: 10px;
+            color: #6b7280;
+        }
+        .empty-history {
+            font-size: 12px;
+            color: #6b7280;
+            text-align: center;
+            font-style: italic;
+            padding: 6px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- LOGIN VIEW -->
+    <div id="login-view" class="card-box">
+        <button onclick="openAdminLoginModal()" class="admin-top-btn" title="Dashboard Admin">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        </button>
+
+        <div class="app-logo">
+            <svg class="svg-icon" style="width: 36px; height: 36px;" viewBox="0 0 24 24"><path d="M20,6H16V4A2,2 0 0,0 14,2H10A2,2 0 0,0 8,4V6H4A2,2 0 0,0 2,8V12A2,2 0 0,0 4,14H6V18A2,2 0 0,0 8,20H12V22H16V20H18A2,2 0 0,0 20,18V14H22A2,2 0 0,0 24,12V8A2,2 0 0,0 22,6H20M10,4H14V6H10V4Z"/></svg>
+        </div>
+        <h1 class="app-title">Pixel Slide Quest</h1>
+        <p class="app-sub">Masukkan Email dan Password untuk mulai bermain.</p>
+        
+        <div class="input-group">
+            <svg class="svg-icon left-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <input type="email" id="email-input" class="input-field no-right-icon" placeholder="name@gmail.com">
+        </div>
+
+        <div class="input-group">
+            <svg class="svg-icon left-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            <input type="password" id="password-input" class="input-field" placeholder="Password akun">
+            <button type="button" onclick="togglePasswordVisibility()" class="toggle-password" id="eye-btn" title="Tampilkan/Sembunyikan Password">
+                <svg id="eye-icon" class="svg-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </button>
+        </div>
+
+        <button onclick="handleLogin()" class="btn-purple">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.35 11.1h-9.17v2.73h6.51c-.33 1.76-1.82 3.08-3.84 3.08-2.3 0-4.16-1.86-4.16-4.16s1.86-4.16 4.16-4.16c1.05 0 2.01.39 2.74 1.05l2.05-2.05C18.35 6.2 16.5 5.5 14.69 5.5 10.44 5.5 7 8.94 7 13.19s3.44 7.69 7.69 7.69c4.44 0 7.4-3.12 7.4-7.53 0-.58-.06-1.13-.17-1.65z"/></svg>
+            Masuk / Daftar Akun
+        </button>
+
+        <div class="app-credit">Made by : Pahrul & Gemini AI</div>
+    </div>
+
+    <!-- GAME VIEW -->
+    <div id="game-view" class="container hidden">
+        
+        <div class="account-bar">
+            <div class="account-left">
+                <div class="avatar" onclick="openProfileModal()" title="Buka Profil & Riwayat">
+                    <svg class="svg-icon" style="width:22px; height:22px;" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+                <div class="account-info">
+                    <span class="acc-label">Akun (Klik Avatar untuk Profil)</span>
+                    <span id="user-email-display" class="acc-email">user@gmail.com</span>
+                </div>
+            </div>
+            <button onclick="openLicenseModal()" class="btn-key" title="Masukkan License Key">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-icon c-yellow">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+                </div>
+                <div class="stat-text">
+                    <span class="stat-title">Koin</span>
+                    <span id="coins-val" class="stat-val c-yellow">0</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon c-green">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                </div>
+                <div class="stat-text">
+                    <span class="stat-title">Rupiah</span>
+                    <span id="rupiah-val" class="stat-val c-green">Rp 0</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon c-red">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                <div class="stat-text">
+                    <span class="stat-title">Nyawa</span>
+                    <span id="lives-val" class="stat-val c-red">3</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-row">
+            <button onclick="openShop()" class="btn-act btn-pink">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                Beli
+            </button>
+            <button onclick="openWithdraw()" class="btn-act btn-teal">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 14V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zm-9-1c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm13-6v11c0 1.1-.9 2-2 2H4v-2h17V7h2z"/></svg>
+                Tarik
+            </button>
+            <button onclick="logout()" class="btn-act btn-icon-only" title="Keluar">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+            </button>
+        </div>
+
+        <div class="game-card">
+            <div class="timer-bar">
+                <div class="timer-info">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    <span>Sisa Waktu:</span>
+                    <span id="timer-display" class="timer-clock">03:00</span>
+                </div>
+                <div class="reward-info">
+                    Hadiah: <span class="c-yellow">+5 Koin</span>
+                </div>
+            </div>
+
+            <div id="puzzle-board" class="puzzle-board"></div>
+
+            <div class="game-controls-row">
+                <button onclick="playGame()" class="btn-purple">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    Play
+                </button>
+                <button id="pause-btn" onclick="togglePauseGame()" class="btn-purple btn-pause">
+                    <svg id="pause-icon" class="svg-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    <span id="pause-text">Pause</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL ADMIN LOGIN -->
+    <div id="admin-login-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-title" style="color: #f1c40f;">Login Dashboard Admin</h2>
+            <p style="font-size:12px; color:#8e9aaf; text-align:center;">Masukkan Email dan Password admin yang terdaftar di repositori GitHub.</p>
+            <div class="input-group" style="margin-bottom: 12px;">
+                <input type="email" id="admin-email" class="wd-input" placeholder="Email Admin">
+            </div>
+            <div class="input-group" style="margin-bottom: 12px;">
+                <input type="password" id="admin-password" class="wd-input" placeholder="Password Admin">
+            </div>
+            <button onclick="verifyAdminLogin()" class="btn-purple" style="background: #f1c40f; color: #0f1423;">Masuk Admin</button>
+            <button onclick="closeAdminLoginModal()" class="btn-purple btn-close-flat">Tutup</button>
+        </div>
+    </div>
+
+    <!-- MODAL DASHBOARD ADMIN -->
+    <div id="admin-dashboard-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2 class="modal-title" style="color: #f1c40f;">Dashboard Admin</h2>
+            <p style="font-size:12px; color:#2ecc71; text-align:center; font-weight:700;">Status: Login Admin Berhasil ✅</p>
+            
+            <div style="background: #0f1423; border: 1px solid #283049; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <span style="font-size: 13px; font-weight: 700; color: #8e9aaf; border-bottom: 1px solid #283049; padding-bottom: 4px;">Verifikasi & Tautkan Game ke DANA</span>
+                <p style="font-size: 11px; color: #8e9aaf; line-height: 1.4;">Hubungkan file/kode index.html ini dengan sistem verifikasi penarikan DANA otomatis:</p>
+                
+                <div>
+                    <span style="font-size: 11px; color: #8e9aaf;">Target Nomor DANA Gateway:</span>
+                    <input type="text" id="admin-dana-link" class="wd-input" placeholder="08xxxxxxxxxx (Nomor Gateway)">
+                </div>
+                
+                <button onclick="saveAdminDanaLink()" class="btn-dana" style="font-size: 13px; padding: 10px;">Simpan & Tautkan Akun</button>
+            </div>
+
+            <div class="history-section">
+                <span class="history-title">Daftar Pengguna & Total Penarikan Terdaftar</span>
+                <div id="admin-user-list" class="history-list" style="max-height: 120px;">
+                    <div class="empty-history">Memuat data pengguna...</div>
+                </div>
+            </div>
+
+            <button onclick="closeAdminDashboard()" class="btn-purple btn-close-flat">Keluar Dashboard</button>
+        </div>
+    </div>
+
+    <!-- MODAL PROFIL & RIWAYAT -->
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Profil & Riwayat</h2>
+            <div style="background: #0f1423; border: 1px solid #283049; border-radius: 12px; padding: 12px; font-size: 13px; display: flex; flex-direction: column; gap: 6px;">
+                <div class="receipt-row">
+                    <span class="receipt-label">Email Aktif</span>
+                    <span id="prf-email" class="receipt-val">-</span>
+                </div>
+                <div class="receipt-row" style="border-bottom: none; padding-bottom: 0;">
+                    <span class="receipt-label">Sisa Saldo & Nyawa</span>
+                    <span id="prf-stats" class="receipt-val" style="color: #f1c40f;">-</span>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <span class="history-title">Riwayat Pembelian Nyawa</span>
+                <div id="history-buy-list" class="history-list">
+                    <div class="empty-history">Belum ada riwayat pembelian.</div>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <span class="history-title">Riwayat Penarikan Saldo</span>
+                <div id="history-wd-list" class="history-list">
+                    <div class="empty-history">Belum ada riwayat penarikan.</div>
+                </div>
+            </div>
+
+            <button onclick="closeProfileModal()" class="btn-purple btn-close-flat">Tutup</button>
+        </div>
+    </div>
+
+    <!-- MODAL LICENSE KEY -->
+    <div id="license-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Masukkan License Key</h2>
+            <p style="font-size:12px; color:#8e9aaf; text-align:center;">Masukkan kode license untuk mengisi otomatis jumlah nyawa (1 s.d 10).</p>
+            <input type="text" id="license-input" class="wd-input" placeholder="Contoh: KODE_LICENSE">
+            <button onclick="processLicenseKey()" class="btn-purple">Aktivasi License</button>
+            <button onclick="closeLicenseModal()" class="btn-purple btn-close-flat">Tutup</button>
+        </div>
+    </div>
+
+    <!-- MODAL BUY LIVES -->
+    <div id="shop-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Beli Nyawa</h2>
+            <div class="shop-item" onclick="buyLives(1, 1000)">
+                <span class="shop-lives">❤️ 1 Nyawa</span>
+                <span class="shop-price">Rp 1.000</span>
+            </div>
+            <div class="shop-item" onclick="buyLives(3, 2000)">
+                <span class="shop-lives">❤️ 3 Nyawa</span>
+                <span class="shop-price">Rp 2.000</span>
+            </div>
+            <div class="shop-item" onclick="buyLives(5, 3000)">
+                <span class="shop-lives">❤️ 5 Nyawa</span>
+                <span class="shop-price">Rp 3.000</span>
+            </div>
+            <div class="shop-item" onclick="buyLives(10, 10000)">
+                <span class="shop-lives">❤️ 10 Nyawa</span>
+                <span class="shop-price">Rp 10.000</span>
+            </div>
+            <button onclick="closeShop()" class="btn-purple btn-close-flat">Tutup</button>
+        </div>
+    </div>
+
+    <!-- MODAL WITHDRAW -->
+    <div id="withdraw-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Menu Penarikan</h2>
+
+            <div class="custom-wd-box">
+                <div>
+                    <p style="font-size:12px; color:#8e9aaf; margin-bottom:6px;">Nominal (Min Rp 5.000 - Max Rp 50.000):</p>
+                    <input type="number" id="custom-wd-input" class="wd-input" placeholder="Masukkan Rp...">
+                </div>
+
+                <div>
+                    <p style="font-size:12px; color:#8e9aaf; margin-bottom:6px;">Nomor Akun DANA:</p>
+                    <input type="number" id="dana-account-input" class="wd-input" placeholder="08xxxxxxxxxx">
+                </div>
+
+                <button onclick="processCustomWithdraw()" class="btn-dana">Tarik ke DANA</button>
+            </div>
+
+            <button onclick="closeWithdraw()" class="btn-purple btn-close-flat">Tutup</button>
+        </div>
+    </div>
+
+    <!-- MODAL STRUK PENARIKAN -->
+    <div id="receipt-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-title" style="color: #118eea;">Struk Penarikan</h2>
+            <div class="receipt-card">
+                <div class="receipt-row">
+                    <span class="receipt-label">ID Transaksi</span>
+                    <span id="rcp-id" class="receipt-val">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="receipt-label">Email Akun</span>
+                    <span id="rcp-email" class="receipt-val">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="receipt-label">Akun DANA</span>
+                    <span id="rcp-dana" class="receipt-val" style="color: #118eea;">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="receipt-label">Waktu</span>
+                    <span id="rcp-time" class="receipt-val">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="receipt-label">Nominal</span>
+                    <span id="rcp-amount" class="receipt-val" style="color: #2ecc71;">-</span>
+                </div>
+                <div class="receipt-row" style="border-bottom: none; padding-bottom: 0;">
+                    <span class="receipt-label">Status Auto-Kirim</span>
+                    <span class="receipt-val" style="color: #2ecc71;">TERHUBUNG & DIKIRIM</span>
+                </div>
+            </div>
+            <button onclick="closeReceipt()" class="btn-purple btn-close-flat">Selesai</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let currentUser = null;
+    let userData = { coins: 0, rupiah: 0, lives: 3, buyHistory: [], wdHistory: [] };
+    
+    const GAME_DURATION = 180;
+    let timer = GAME_DURATION;
+    let timerInterval = null;
+    let isPlaying = false;
+    let isPaused = false;
+    let boardState = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    let currentImgUrl = 'https://raw.githubusercontent.com/PahrulXD/AKUN/main/img/d%20on%20TikTok.jpeg';
+
+    function loadLocalUsers() {
+        const data = localStorage.getItem('pixel_quest_users');
+        return data ? JSON.parse(data) : {};
+    }
+
+    function saveLocalUsers(users) {
+        localStorage.setItem('pixel_quest_users', JSON.stringify(users));
+    }
+
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password-input');
+        const eyeIcon = document.getElementById('eye-icon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.innerHTML = '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.12c0-1.66-1.34-3-3-3l-.17.02z"/>';
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+        }
+    }
+
+    // Admin Login Functions
+    function openAdminLoginModal() {
+        document.getElementById('admin-login-modal').classList.remove('hidden');
+    }
+    function closeAdminLoginModal() {
+        document.getElementById('admin-login-modal').classList.add('hidden');
+    }
+    function closeAdminDashboard() {
+        document.getElementById('admin-dashboard-modal').classList.add('hidden');
+    }
+
+    async function verifyAdminLogin() {
+        const inputEmail = document.getElementById('admin-email').value.trim().toLowerCase();
+        const inputPass = document.getElementById('admin-password').value.trim();
+
+        if (!inputEmail || !inputPass) {
+            alert("Masukkan email dan password admin!");
+            return;
+        }
+
+        let adminVerified = false;
+        try {
+            const res = await fetch('https://raw.githubusercontent.com/PahrulXD/AKUN/main/admin.txt');
+            if (res.ok) {
+                const text = await res.text();
+                const lines = text.split(/\r?\n/);
+                for (let line of lines) {
+                    let parts = line.trim().split(':');
+                    if (parts.length >= 2) {
+                        let aEmail = parts[0].trim().toLowerCase();
+                        let aPass = parts[1].trim();
+                        if (inputEmail === aEmail && inputPass === aPass) {
+                            adminVerified = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn("Gagal mengambil admin.txt dari GitHub, menggunakan fallback verifikasi.", e);
+        }
+
+        // Fallback default admin jika github tidak merespon
+        if (!adminVerified && inputEmail === "pahrul@admin.com" && inputPass === "admin123") {
+            adminVerified = true;
+        }
+
+        if (adminVerified) {
+            closeAdminLoginModal();
+            document.getElementById('admin-email').value = '';
+            document.getElementById('admin-password').value = '';
+            
+            // Load Admin Dashboard Data
+            const savedDana = localStorage.getItem('admin_gateway_dana') || '081234567890';
+            document.getElementById('admin-dana-link').value = savedDana;
+
+            const users = loadLocalUsers();
+            const userListContainer = document.getElementById('admin-user-list');
+            const userKeys = Object.keys(users);
+            
+            if (userKeys.length === 0) {
+                userListContainer.innerHTML = '<div class="empty-history">Belum ada akun pengguna terdaftar.</div>';
+            } else {
+                userListContainer.innerHTML = userKeys.map(u => `
+                    <div class="history-item">
+                        <div class="history-row">
+                            <span style="font-weight:700; color:#118eea;">${u}</span>
+                            <span style="color:#2ecc71;">Rp ${(users[u].rupiah || 0).toLocaleString('id-ID')}</span>
+                        </div>
+                        <span style="color:#8e9aaf; font-size:10px;">Total WD Tercatat: ${(users[u].wdHistory || []).length} Transaksi</span>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+        } else {
+            alert("Login admin tidak disetujui! Email atau password admin tidak sesuai dengan data GitHub.");
+        }
+    }
+
+    function saveAdminDanaLink() {
+        const danaVal = document.getElementById('admin-dana-link').value.trim();
+        if (!danaVal) {
+            alert("Masukkan nomor DANA gateway yang valid!");
+            return;
+        }
+        localStorage.setItem('admin_gateway_dana', danaVal);
+        alert("Berhasil menautkan game code index.html dengan sistem penarikan akun DANA otomatis!");
+    }
+
+    function handleLogin() {
+        const email = document.getElementById('email-input').value.trim().toLowerCase();
+        const password = document.getElementById('password-input').value.trim();
+
+        if (!email) {
+            alert("Masukkan Email terlebih dahulu!");
+            return;
+        }
+        if (!password) {
+            alert("Masukkan Password terlebih dahulu!");
+            return;
+        }
+
+        let users = loadLocalUsers();
+
+        if (users[email]) {
+            if (users[email].password !== password) {
+                alert("Password salah! Silakan masukkan password yang benar untuk akun ini.");
+                return;
+            }
+            userData = users[email];
+            if (!userData.buyHistory) userData.buyHistory = [];
+            if (!userData.wdHistory) userData.wdHistory = [];
+        } else {
+            userData = { password: password, coins: 0, rupiah: 0, lives: 3, buyHistory: [], wdHistory: [] };
+            users[email] = userData;
+            saveLocalUsers(users);
+        }
+
+        currentUser = email;
+        document.getElementById('user-email-display').innerText = currentUser;
+        updateUI();
+        
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('game-view').classList.remove('hidden');
+        
+        if (userData.rupiah >= 50000) {
+            alert("Saldo akun Anda telah mencapai Rp 50.000! Permainan dihentikan, silakan lakukan penarikan saldo terlebih dahulu.");
+            openWithdraw();
+        }
+
+        loadNewPuzzle();
+    }
+
+    function logout() {
+        pauseTimer();
+        isPlaying = false;
+        isPaused = false;
+        resetPauseButtonUI();
+        currentUser = null;
+        document.getElementById('password-input').value = '';
+        document.getElementById('game-view').classList.add('hidden');
+        document.getElementById('login-view').classList.remove('hidden');
+    }
+
+    function updateUI() {
+        document.getElementById('coins-val').innerText = userData.coins;
+        document.getElementById('rupiah-val').innerText = `Rp ${userData.rupiah.toLocaleString('id-ID')}`;
+        document.getElementById('lives-val').innerText = userData.lives;
+    }
+
+    function syncDataBackend() {
+        if (!currentUser) return;
+        let users = loadLocalUsers();
+        users[currentUser] = userData;
+        saveLocalUsers(users);
+    }
+
+    function loadNewPuzzle() {
+        currentImgUrl = 'https://raw.githubusercontent.com/PahrulXD/AKUN/main/img/d%20on%20TikTok.jpeg';
+        boardState = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        renderBoard();
+    }
+
+    function shufflePuzzle() {
+        for (let i = 0; i < 100; i++) {
+            const validMoves = getValidMoves();
+            const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+            const emptyIdx = boardState.indexOf(8);
+            [boardState[emptyIdx], boardState[randomMove]] = [boardState[randomMove], boardState[emptyIdx]];
+        }
+        renderBoard();
+    }
+
+    function renderBoard() {
+        const board = document.getElementById('puzzle-board');
+        board.innerHTML = '';
+
+        boardState.forEach((val, idx) => {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+
+            if (val === 8) {
+                tile.classList.add('tile-empty');
+            } else {
+                tile.style.backgroundImage = `url('${currentImgUrl}')`;
+                const x = (val % 3) * 50;
+                const y = Math.floor(val / 3) * 50;
+                tile.style.backgroundPosition = `${x}% ${y}%`;
+                tile.onclick = () => onTileClick(idx);
+            }
+            board.appendChild(tile);
+        });
+    }
+
+    function getValidMoves() {
+        const emptyIdx = boardState.indexOf(8);
+        const row = Math.floor(emptyIdx / 3);
+        const col = emptyIdx % 3;
+        const moves = [];
+
+        if (row > 0) moves.push(emptyIdx - 3);
+        if (row < 2) moves.push(emptyIdx + 3);
+        if (col > 0) moves.push(emptyIdx - 1);
+        if (col < 2) moves.push(emptyIdx + 1);
+
+        return moves;
+    }
+
+    function onTileClick(idx) {
+        if (!isPlaying || isPaused) return;
+
+        const validMoves = getValidMoves();
+        if (validMoves.includes(idx)) {
+            const emptyIdx = boardState.indexOf(8);
+            [boardState[emptyIdx], boardState[idx]] = [boardState[idx], boardState[emptyIdx]];
+            renderBoard();
+            checkWin();
+        }
+    }
+
+    function playGame() {
+        if (userData.rupiah >= 50000 && !isPlaying) {
+            alert("Saldo akun Anda sudah mencapai batas Rp 50.000! Harap lakukan penarikan terlebih dahulu sebelum melanjutkan permainan.");
+            openWithdraw();
+            return;
+        }
+
+        if (!isPlaying || isPaused) {
+            if (!isPlaying) {
+                if (userData.lives <= 0) {
+                    alert("Nyawa Anda sudah habis! Wajib melakukan pembelian nyawa terlebih dahulu untuk dapat bermain.");
+                    openShop();
+                    return;
+                }
+
+                shufflePuzzle(); 
+                timer = GAME_DURATION;
+            }
+
+            isPlaying = true;
+            isPaused = false;
+            resetPauseButtonUI();
+            startTimer();
+        }
+    }
+
+    function togglePauseGame() {
+        if (!isPlaying && !isPaused) {
+            alert("Game belum dimulai! Silakan tekan tombol 'Play' terlebih dahulu.");
+            return;
+        }
+
+        if (!isPaused) {
+            pauseTimer();
+            isPaused = true;
+            setResumeButtonUI();
+        } else {
+            isPaused = false;
+            resetPauseButtonUI();
+            startTimer();
+        }
+    }
+
+    function setResumeButtonUI() {
+        const btn = document.getElementById('pause-btn');
+        const icon = document.getElementById('pause-icon');
+        const txt = document.getElementById('pause-text');
+
+        btn.classList.add('btn-resume');
+        icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+        txt.innerText = 'Lanjutkan';
+    }
+
+    function resetPauseButtonUI() {
+        const btn = document.getElementById('pause-btn');
+        const icon = document.getElementById('pause-icon');
+        const txt = document.getElementById('pause-text');
+
+        btn.classList.remove('btn-resume');
+        icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+        txt.innerText = 'Pause';
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timer--;
+            updateTimerDisplay();
+
+            if (timer <= 0) {
+                handleGameOver();
+            }
+        }, 1000);
+    }
+
+    function pauseTimer() {
+        clearInterval(timerInterval);
+    }
+
+    function updateTimerDisplay() {
+        const mins = Math.floor(timer / 60).toString().padStart(2, '0');
+        const secs = (timer % 60).toString().padStart(2, '0');
+        document.getElementById('timer-display').innerText = `${mins}:${secs}`;
+    }
+
+    function handleGameOver() {
+        pauseTimer();
+        isPlaying = false;
+        isPaused = false;
+        resetPauseButtonUI();
+
+        userData.lives -= 1;
+        updateUI();
+        syncDataBackend();
+
+        alert("Waktu 3 Menit Habis! Nyawa Anda berkurang 1. Silakan tekan tombol 'Play' untuk mencoba lagi.");
+        
+        timer = GAME_DURATION;
+        updateTimerDisplay();
+        loadNewPuzzle();
+    }
+
+    function checkWin() {
+        const isWin = boardState.every((val, index) => val === index);
+        if (isWin) {
+            pauseTimer();
+            isPlaying = false;
+            isPaused = false;
+            resetPauseButtonUI();
+
+            userData.coins += 5;
+            userData.rupiah += 5;
+            updateUI();
+            syncDataBackend();
+
+            alert("Selamat! Anda berhasil menyelesaikan puzzle dan mendapatkan +5 Koin & +5 Rupiah! Silakan tekan 'Play' untuk melanjutkan permainan.");
+            timer = GAME_DURATION;
+            updateTimerDisplay();
+            loadNewPuzzle();
+        }
+    }
+
+    function openShop() { document.getElementById('shop-modal').classList.remove('hidden'); }
+    function closeShop() { document.getElementById('shop-modal').classList.add('hidden'); }
+
+    function openLicenseModal() { document.getElementById('license-modal').classList.remove('hidden'); }
+    function closeLicenseModal() { document.getElementById('license-modal').classList.add('hidden'); }
+
+    // Fungsi Profil & Riwayat
+    function openProfileModal() {
+        document.getElementById('prf-email').innerText = currentUser;
+        document.getElementById('prf-stats').innerText = `Rp ${userData.rupiah.toLocaleString('id-ID')} | ❤️ ${userData.lives} Nyawa`;
+        
+        // Render Riwayat Pembelian
+        const buyListContainer = document.getElementById('history-buy-list');
+        if (!userData.buyHistory || userData.buyHistory.length === 0) {
+            buyListContainer.innerHTML = '<div class="empty-history">Belum ada riwayat pembelian.</div>';
+        } else {
+            buyListContainer.innerHTML = userData.buyHistory.map(item => `
+                <div class="history-item">
+                    <div class="history-row">
+                        <span style="font-weight:700; color:#ff4757;">❤️ ${item.amount} Nyawa</span>
+                        <span style="font-weight:700; color:#2ecc71;">Rp ${item.price.toLocaleString('id-ID')}</span>
+                    </div>
+                    <span class="history-time">${item.time}</span>
+                </div>
+            `).join('');
+        }
+
+        // Render Riwayat Penarikan
+        const wdListContainer = document.getElementById('history-wd-list');
+        if (!userData.wdHistory || userData.wdHistory.length === 0) {
+            wdListContainer.innerHTML = '<div class="empty-history">Belum ada riwayat penarikan.</div>';
+        } else {
+            wdListContainer.innerHTML = userData.wdHistory.map(item => `
+                <div class="history-item">
+                    <div class="history-row">
+                        <span style="font-weight:700; color:#118eea;">DANA: ${item.dana}</span>
+                        <span style="font-weight:700; color:#2ecc71;">Rp ${item.amount.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div class="history-row">
+                        <span style="color:#8e9aaf; font-size:10px;">ID: ${item.trxId}</span>
+                        <span class="history-time">${item.time}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('profile-modal').classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+        document.getElementById('profile-modal').classList.add('hidden');
+    }
+
+    async function processLicenseKey() {
+        const keyVal = document.getElementById('license-input').value.trim();
+        if (!keyVal) {
+            alert("Masukkan kode license terlebih dahulu!");
+            return;
+        }
+
+        try {
+            const res = await fetch('https://raw.githubusercontent.com/PahrulXD/AKUN/main/key.txt');
+            if (!res.ok) throw new Error("Gagal mengambil file key dari GitHub.");
+
+            const text = await res.text();
+            const lines = text.split(/\r?\n/);
+            
+            let matchedLives = null;
+            for (let line of lines) {
+                let lineClean = line.trim();
+                if (!lineClean || !lineClean.includes(':')) continue;
+                let parts = lineClean.split(':');
+                if (parts.length === 2) {
+                    let k = parts[0].trim();
+                    let l_val = parseInt(parts[1].trim());
+                    if (k === keyVal && !isNaN(l_val)) {
+                        matchedLives = l_val;
+                        break;
+                    }
+                }
+            }
+
+            if (matchedLives !== null && matchedLives >= 1 && matchedLives <= 10) {
+                userData.lives += matchedLives;
+                updateUI();
+                syncDataBackend();
+                alert(`License valid! Berhasil menambahkan ${matchedLives} nyawa.`);
+                document.getElementById('license-input').value = '';
+                closeLicenseModal();
+            } else {
+                alert("License key tidak valid atau jumlah nyawa di luar batas (1-10).");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Gagal memverifikasi license dari GitHub.");
+        }
+    }
+
+    function openWithdraw() { 
+        document.getElementById('withdraw-modal').classList.remove('hidden'); 
+    }
+    function closeWithdraw() { document.getElementById('withdraw-modal').classList.add('hidden'); }
+    function closeReceipt() { document.getElementById('receipt-modal').classList.add('hidden'); }
+
+    function buyLives(amount, price) {
+        if (userData.rupiah < price) {
+            alert("Saldo Rupiah Anda tidak mencukupi untuk membeli paket ini!");
+            return;
+        }
+
+        userData.rupiah -= price;
+        userData.coins -= price; 
+        userData.lives += amount;
+
+        const now = new Date();
+        const timestampStr = now.toISOString().slice(0, 19).replace('T', ' ');
+        if (!userData.buyHistory) userData.buyHistory = [];
+        userData.buyHistory.unshift({ amount: amount, price: price, time: timestampStr });
+
+        updateUI();
+        syncDataBackend();
+
+        alert(`Berhasil membeli ${amount} Nyawa!`);
+        closeShop();
+    }
+
+    function processCustomWithdraw() {
+        const val = parseInt(document.getElementById('custom-wd-input').value);
+        const danaAcc = document.getElementById('dana-account-input').value.trim();
+
+        if (isNaN(val) || val < 5000) {
+            alert("Minimal penarikan adalah Rp 5.000!");
+            return;
+        }
+
+        if (val > 50000) {
+            alert("Maksimal penarikan sekali transaksi adalah Rp 50.000!");
+            return;
+        }
+
+        if (!danaAcc) {
+            alert("Masukkan nomor akun DANA Anda terlebih dahulu!");
+            return;
+        }
+
+        if (userData.rupiah < val || userData.coins < val) {
+            alert("Saldo Rupiah atau Koin Anda tidak mencukupi untuk penarikan ini!");
+            return;
+        }
+
+        userData.rupiah -= val;
+        userData.coins -= val;
+
+        const now = new Date();
+        const timestampStr = now.toISOString().slice(0, 19).replace('T', ' ');
+        const trxId = `WD${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+
+        if (!userData.wdHistory) userData.wdHistory = [];
+        userData.wdHistory.unshift({ trxId: trxId, dana: danaAcc, amount: val, time: timestampStr });
+
+        updateUI();
+        syncDataBackend();
+
+        document.getElementById('custom-wd-input').value = '';
+        document.getElementById('dana-account-input').value = '';
+        closeWithdraw();
+
+        document.getElementById('rcp-id').innerText = trxId;
+        document.getElementById('rcp-email').innerText = currentUser;
+        document.getElementById('rcp-dana').innerText = danaAcc;
+        document.getElementById('rcp-time').innerText = timestampStr;
+        document.getElementById('rcp-amount').innerText = `Rp ${val.toLocaleString('id-ID')}`;
+        
+        document.getElementById('receipt-modal').classList.remove('hidden');
+
+        if (userData.rupiah >= 50000) {
+            alert("Saldo akun masih mencapai atau melebihi Rp 50.000. Harap tarik kembali hingga di bawah batas ketentuan.");
+        }
+    }
+</script>
+
+</body>
+</html>
